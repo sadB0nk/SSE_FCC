@@ -1,0 +1,4 @@
+Arduino startup: 2023/03/27 12:38:34 Starting arduinno connect on Port: COM3, with baudrate: 115200
+Arduino startup: 2023/03/27 12:38:34 Serial port not found
+Arduino startup: 2023/03/27 12:39:26 Starting arduinno connect on Port: COM3, with baudrate: 115200
+Arduino startup: 2023/03/27 12:39:26 Serial port not found
