@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"go.bug.st/serial"
 	"log"
 	"os"
@@ -23,25 +25,39 @@ func main() {
 	}
 	defer f.Close()
 	logger := log.New(f, "INFO: ", log.Ldate|log.Ltime)
+	comport := flag.String("port", "", "Settings arduino port")
+	flag.Parse()
 
-	a := arduino.Connect(mode, logger, "COM3")
+	if len(*comport) == 0 {
+		ports, err := serial.GetPortsList()
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("Error. You need to select one of available ports using the flag \"--port\"\n %s", ports)
+		os.Exit(1)
+	}
+	a := arduino.Connect(mode, logger, *comport)
 	defer a.Port.Close()
-
+	wp.Add(1)
 	go func() {
-		wp.Add(1)
+
 		defer wp.Done()
+		// this function listening COM port and logging data.
 		err := a.Debug(logger)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}()
+	wp.Add(1)
 	go func() {
-		wp.Add(1)
+
 		defer wp.Done()
+		// This function start interface for people.
 		err := console.Start(logger, a)
 		if err != nil {
 			log.Fatal(err)
 		}
+
 	}()
 	wp.Wait()
 }
