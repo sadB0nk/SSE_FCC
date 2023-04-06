@@ -29,11 +29,10 @@ func Start(logger *log.Logger, a arduino.Arduino) error {
 			fmt.Println("Too many arguments")
 			continue
 		}
-		for i := 0; i < len(massive_message_int)-1; i++ {
+		for i := 0; i < len(massive_message); i++ {
 			k := i
 			tmp, err := strconv.Atoi(massive_message[i])
 			if err != nil {
-				fmt.Println(massive_message[i])
 				fmt.Println("Error of parsing ")
 				continue
 			}
@@ -47,7 +46,7 @@ func Start(logger *log.Logger, a arduino.Arduino) error {
 			continue
 		}
 		massive_message_int[2] = len(massive_message) - 2
-		for i := 0; i < len(massive_message_int); i++ {
+		for i := 0; i < len(massive_message); i++ {
 			s := strconv.Itoa(massive_message_int[i])
 			a.Dataload(logger, s+"\n")
 		}

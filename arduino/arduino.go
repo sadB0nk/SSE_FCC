@@ -25,6 +25,7 @@ func Connect(mode *serial.Mode, logger *log.Logger, port string) (a Arduino) {
 	a.Port = conn
 	return a
 }
+
 func (a Arduino) Debug(logger *log.Logger) error {
 	reader := bufio.NewReader(a.Port)
 

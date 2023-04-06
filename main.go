@@ -40,7 +40,6 @@ func main() {
 	defer a.Port.Close()
 	wp.Add(1)
 	go func() {
-
 		defer wp.Done()
 		// this function listening COM port and logging data.
 		err := a.Debug(logger)
