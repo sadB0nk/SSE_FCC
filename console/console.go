@@ -1,66 +1,52 @@
 package console
 
 import (
+	"bufio"
 	"fmt"
+	"log"
+	"os"
 	"strconv"
 	"strings"
-
-	"log"
-
 	"tmp/arduino"
 )
 
 var s string
+var massive_message_int [16]int
 
 func Start(logger *log.Logger, a arduino.Arduino) error {
+	//data structure: [team number], [command number], [len of payload of elem massive], [payload massive]
 	fmt.Println("Message to arduino must be: Number of team should be done -\"1 10\" or \"1-3 10\" <- This message will be sent to team 1,2,3")
 	for {
 		logger.SetPrefix("Console input: ")
-		output := ""
-		fmt.Scan(&s)
-		if len(s) == 1 {
-			output = s + " "
-			i1, err := strconv.Atoi(s)
-			if err != nil {
-				fmt.Println("Error of parsing, num of team.")
-				continue
-			}
-			if i1 < 1 || i1 > 6 {
-				fmt.Println("Team number should be from 1 to 6")
-				continue
-			}
-			fmt.Scan(&s)
-			output += s
+		buff := bufio.NewReader(os.Stdin)
+		message, err := buff.ReadString('\n')
+		if err != nil {
+			log.Fatal(err)
+		}
+		message = strings.Trim(message, "\n\t\r")
+		fmt.Println(message)
+		massive_message := strings.Split(message, " ")
+		fmt.Println(massive_message)
+		for i := 0; i < 2; i++ {
+			tmp, err := strconv.Atoi(massive_message[i])
 
-			a.Dataload(logger, output)
+			if err != nil {
+				fmt.Println(massive_message[i])
+				fmt.Println("Error of parsing ")
+				continue
+			}
+			massive_message_int[i] = tmp
+		}
+		if massive_message_int[0] < 1 && massive_message_int[0] > 6 {
+			fmt.Println("Team number must be from 1 to 6")
 			continue
 		}
-
-		if len(s) == 3 {
-			tmp := strings.Split(s, "-")
-			fmt.Scan(&s)
-			i1, err := strconv.Atoi(tmp[0])
-			if err != nil {
-				fmt.Println("Error of parsing first int\t", err)
-				continue
+		if len(massive_message) == 2 {
+			massive_message_int[3] = 0
+			for i := 0; i < 3; i++ {
+				s := strconv.Itoa(massive_message_int[i])
+				a.Dataload(logger, s+"\n")
 			}
-			i2, err := strconv.Atoi(tmp[1])
-			if err != nil {
-				fmt.Println("Error of parsing second int\t", err)
-				continue
-			}
-			if i2 < 1 || i2 > 6 || i1 < 1 || i1 > 6 {
-				fmt.Println("Team number should be from 1 to 6")
-				continue
-			}
-			for i := i1; i <= i2; i++ {
-				tmp := strconv.Itoa(i)
-				output = tmp + " "
-				output += s
-				a.Dataload(logger, output+"\n")
-			}
-			continue
 		}
-		fmt.Println("Team number should be from 1 to 6")
 	}
 }
