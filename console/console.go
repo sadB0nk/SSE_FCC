@@ -24,29 +24,32 @@ func Start(logger *log.Logger, a arduino.Arduino) error {
 			log.Fatal(err)
 		}
 		message = strings.Trim(message, "\n\t\r")
-		fmt.Println(message)
 		massive_message := strings.Split(message, " ")
-		fmt.Println(massive_message)
-		for i := 0; i < 2; i++ {
+		if len(massive_message) > 15 {
+			fmt.Println("Too many arguments")
+			continue
+		}
+		for i := 0; i < len(massive_message_int)-1; i++ {
+			k := i
 			tmp, err := strconv.Atoi(massive_message[i])
-
 			if err != nil {
 				fmt.Println(massive_message[i])
 				fmt.Println("Error of parsing ")
 				continue
 			}
-			massive_message_int[i] = tmp
+			if i >= 2 {
+				k++
+			}
+			massive_message_int[k] = tmp
 		}
 		if massive_message_int[0] < 1 && massive_message_int[0] > 6 {
 			fmt.Println("Team number must be from 1 to 6")
 			continue
 		}
-		if len(massive_message) == 2 {
-			massive_message_int[3] = 0
-			for i := 0; i < 3; i++ {
-				s := strconv.Itoa(massive_message_int[i])
-				a.Dataload(logger, s+"\n")
-			}
+		massive_message_int[2] = len(massive_message) - 2
+		for i := 0; i < len(massive_message_int); i++ {
+			s := strconv.Itoa(massive_message_int[i])
+			a.Dataload(logger, s+"\n")
 		}
 	}
 }
